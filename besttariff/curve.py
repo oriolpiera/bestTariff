@@ -19,7 +19,7 @@ class Curve:
     def dayOfWeek(self):
         return self.date.weekday()
 
-class TariffPeriod:
+class OldTariffPeriod:
     """Model TariffPeriod represents a tariff period on specific time and price
     @param  start_hour      int from 0 to 22
     @param  end_hour        int from 1 to 23
@@ -86,3 +86,17 @@ class Tariff:
         if format is None:
             return calendar.timegm(date.timetuple())
         return calendar.timegm(datetime.strptime(date, format).timetuple())
+
+class TariffPeriod:
+    """Model TariffPeriod represents a tariff period on specific time and price
+    @param  start_time      datetime
+    @param  end_time        datetime
+    @param  kwh_price       float(1.0)
+    """
+    def __init__(self, start_time, end_time, kwh_price):
+        self.start_time = start_time
+        self.end_time = end_time
+        self.kwh_price = kwh_price
+
+    def getPrice(self):
+        return self.kwh_price

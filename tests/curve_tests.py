@@ -20,10 +20,10 @@ class TariffPeriodTests(unittest.TestCase):
 
         self.assertEqual(price, 0.131)
 
-class TariffTests(unittest.TestCase):
+class OldTariffTests(unittest.TestCase):
     def test__loadTariffPeriod__oneOk(self):
         tp = TariffPeriod(0,23,0, 0.131)
-        t = Tariff()
+        t = OldTariff()
 
         t.loadTariffPeriod([tp])
 
@@ -42,7 +42,7 @@ class TariffTests(unittest.TestCase):
     def test__loadTariffPeriod__twoOk(self):
         tp1 = TariffPeriod(0,23,0, 0.131)
         tp2 = TariffPeriod(0,23,1, 0.132)
-        t = Tariff()
+        t = OldTariff()
 
         t.loadTariffPeriod([tp1,tp2])
 
@@ -64,7 +64,7 @@ class TariffTests(unittest.TestCase):
     def test__loadTariffPeriod__overlapException(self):
         tp1 = TariffPeriod(0,12,0, 0.131)
         tp2 = TariffPeriod(12,23,0, 0.132)
-        t = Tariff()
+        t = OldTariff()
         with self.assertRaises(Exception) as cm:
             t.loadTariffPeriod([tp1,tp2])
 
@@ -73,7 +73,7 @@ class TariffTests(unittest.TestCase):
 
     def test__loadTariffPeriod__isCompleted(self):
         tp1 = TariffPeriod(0,23,0, 0.131)
-        t = Tariff()
+        t = OldTariff()
         t.loadTariffPeriod([TariffPeriod(0,23,0, 0.131),
         TariffPeriod(0,23,1, 0.131),
         TariffPeriod(0,23,2, 0.131),
@@ -87,10 +87,25 @@ class TariffTests(unittest.TestCase):
     def test__loadTariffPeriod__isNotCompleted(self):
         tp1 = TariffPeriod(0,12,0, 0.131)
         tp2 = TariffPeriod(13,23,0, 0.132)
-        t = Tariff()
+        t = OldTariff()
         t.loadTariffPeriod([tp1,tp2])
 
         self.assertFalse(t.isCompleted())
+
+class TariffTests(unittest.TestCase):
+    def test__getKeyDay__datetime(self):
+        t = Tariff()
+
+        key = t.getKeyDay(datetime(2020, 1, 1))
+
+        self.assertEqual(key, 1577836800)
+
+    def test__getKeyDay__string(self):
+        t = Tariff()
+
+        key = t.getKeyDay("01/01/2020", "%d/%m/%Y")
+
+        self.assertEqual(key, 1577836800)
 
 if __name__ == '__main__':
     unittest.main()

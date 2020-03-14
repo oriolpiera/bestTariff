@@ -1,5 +1,11 @@
 from datetime import datetime, timedelta
 import numpy as np
+import calendar
+
+#TARIFF TYPES
+TARIFF_TYPE_ENERGY = 1
+TARIFF_TYPE_POWER = 2
+
 
 class Curve:
     """Model Curve represents consumcion on specidic date an hour
@@ -29,14 +35,15 @@ class TariffPeriod:
     def getPrice(self):
         return self.kwh_price
 
-class Tariff:
+class OldTariff:
     """Model Tariff represents all tariff of the contract
     @param  periods     matrix that represent a whole week of prices
     """
-    def __init__(self, periods=None):
+    def __init__(self, tariff_type=TARIFF_TYPE_ENERGY, periods=None):
         if periods is None:
             periods = np.zeros(shape=(7,24))
         self.periods = periods
+        self.tariff_type = tariff_type
 
     def loadTariffPeriod(self, tariffPeriodList):
         """Load TariffPeriod to Tariff matrix {periods}
@@ -57,3 +64,25 @@ class Tariff:
 
     def isCompleted(self):
         return 0 not in self.periods
+
+class Tariff:
+    """Model Tariff represents all tariff of the contract
+    @param  periods     matrix that represent a whole week of prices
+    """
+    def __init__(self, tariff_type=TARIFF_TYPE_ENERGY, periods=None):
+        if periods is None:
+            periods = {}
+        self.periods = periods
+        self.tariff_type = tariff_type
+
+    def loadTariffPeriod(self, tariffPeriodList):
+        """Load TariffPeriod to Tariff matrix {periods}
+        Arguments:
+            tariffPeriodList {[TariffPeriod]} -- List of TariffPeriod objects
+        """
+        return True
+
+    def getKeyDay(self, date, format=None):
+        if format is None:
+            return calendar.timegm(date.timetuple())
+        return calendar.timegm(datetime.strptime(date, format).timetuple())

@@ -54,3 +54,6 @@ class Tariff:
 
     def getMatrix(self):
         return self.periods
+
+    def isCompleted(self):
+        return 0 not in self.periods

@@ -46,6 +46,8 @@ class Tariff:
         for tariffPeriod in tariffPeriodList:
             hour = tariffPeriod.start_hour
             while hour <= tariffPeriod.end_hour:
+                if self.periods[tariffPeriod.day_of_week][hour] != 0:
+                    raise Exception("Overlap tariff period")
                 self.periods[tariffPeriod.day_of_week][hour] \
                     = tariffPeriod.kwh_price
                 hour += 1

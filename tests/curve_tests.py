@@ -61,6 +61,15 @@ class TariffTests(unittest.TestCase):
             [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
             [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]])
 
+    def test__loadTariffPeriod__overlapException(self):
+        tp1 = TariffPeriod(0,12,0, 0.131)
+        tp2 = TariffPeriod(12,23,0, 0.132)
+        t = Tariff()
+        with self.assertRaises(Exception) as cm:
+            t.loadTariffPeriod([tp1,tp2])
+
+        the_exception = cm.exception
+        self.assertEqual(str(the_exception), "Overlap tariff period")
 
 if __name__ == '__main__':
     unittest.main()

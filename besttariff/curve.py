@@ -19,55 +19,9 @@ class Curve:
     def dayOfWeek(self):
         return self.date.weekday()
 
-class OldTariffPeriod:
-    """Model TariffPeriod represents a tariff period on specific time and price
-    @param  start_hour      int from 0 to 22
-    @param  end_hour        int from 1 to 23
-    @param  day_of_week     int from 0 to 6
-    @param  kwh_price       float(1.0)
-    """
-    def __init__(self, start_hour, end_hour, day_of_week, kwh_price):
-        self.start_hour = start_hour
-        self.end_hour = end_hour
-        self.day_of_week = day_of_week
-        self.kwh_price = kwh_price
-    
-    def getPrice(self):
-        return self.kwh_price
-
-class OldTariff:
-    """Model Tariff represents all tariff of the contract
-    @param  periods     matrix that represent a whole week of prices
-    """
-    def __init__(self, tariff_type=TARIFF_TYPE_ENERGY, periods=None):
-        if periods is None:
-            periods = np.zeros(shape=(7,24))
-        self.periods = periods
-        self.tariff_type = tariff_type
-
-    def loadTariffPeriod(self, tariffPeriodList):
-        """Load TariffPeriod to Tariff matrix {periods}
-        Arguments:
-            tariffPeriodList {[TariffPeriod]} -- List of TariffPeriod objects
-        """
-        for tariffPeriod in tariffPeriodList:
-            hour = tariffPeriod.start_hour
-            while hour <= tariffPeriod.end_hour:
-                if self.periods[tariffPeriod.day_of_week][hour] != 0:
-                    raise Exception("Overlap tariff period")
-                self.periods[tariffPeriod.day_of_week][hour] \
-                    = tariffPeriod.kwh_price
-                hour += 1
-
-    def getMatrix(self):
-        return self.periods
-
-    def isCompleted(self):
-        return 0 not in self.periods
-
 class Tariff:
     """Model Tariff represents all tariff of the contract
-    @param  periods     matrix that represent a whole week of prices
+    @param  periods     dict that represent a whole tariff, key is %Y%m%d%H
     """
     def __init__(self, tariff_type=TARIFF_TYPE_ENERGY, periods=None):
         if periods is None:
@@ -80,17 +34,23 @@ class Tariff:
         Arguments:
             tariffPeriodList {[TariffPeriod]} -- List of TariffPeriod objects
         """
-        return True
+        for tariffPeriod in tariffPeriodList:
+            start_time = tariffPeriod.start_time
+            while start_time < tariffPeriod.end_time:
+                if self.getKeyDay(start_time) in self.periods:
+                    raise Exception("Overlap tariff period")
+                self.periods[self.getKeyDay(start_time)] = tariffPeriod.kwh_price
+                start_time += timedelta(hours=1)
 
     def getKeyDay(self, date, format=None):
         if format is None:
-            return calendar.timegm(date.timetuple())
-        return calendar.timegm(datetime.strptime(date, format).timetuple())
+            return int(datetime.strftime(date, "%Y%m%d%H"))
+        return int(datetime.strftime(datetime.strptime(date, format), "%Y%m%d%H"))
 
 class TariffPeriod:
     """Model TariffPeriod represents a tariff period on specific time and price
-    @param  start_time      datetime
-    @param  end_time        datetime
+    @param  start_time      datetime(2020, 01, 01, 0)
+    @param  end_time        datetime(2020, 01, 01, 0)
     @param  kwh_price       float(1.0)
     """
     def __init__(self, start_time, end_time, kwh_price):

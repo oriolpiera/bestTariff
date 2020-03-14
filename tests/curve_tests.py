@@ -11,102 +11,64 @@ class CurveTests(unittest.TestCase):
 
         self.assertEqual(d, 2)
 
-
-class OldTariffPeriodTests(unittest.TestCase):
-    def test__getPrice__Ok(self):
-        tp = OldTariffPeriod(0,23,0, 0.131)
-
-        price = tp.getPrice()
-
-        self.assertEqual(price, 0.131)
-
-class OldTariffTests(unittest.TestCase):
-    def test__loadTariffPeriod__oneOk(self):
-        tp = OldTariffPeriod(0,23,0, 0.131)
-        t = OldTariff()
-
-        t.loadTariffPeriod([tp])
-
-        np.testing.assert_array_equal(t.getMatrix(),
-            [[0.131,0.131,0.131,0.131,0.131,0.131,
-            0.131,0.131,0.131,0.131,0.131,0.131,
-            0.131,0.131,0.131,0.131,0.131,0.131,
-            0.131,0.131,0.131,0.131,0.131,0.131],
-            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]])
-
-    def test__loadTariffPeriod__twoOk(self):
-        tp1 = OldTariffPeriod(0,23,0, 0.131)
-        tp2 = OldTariffPeriod(0,23,1, 0.132)
-        t = OldTariff()
-
-        t.loadTariffPeriod([tp1,tp2])
-
-        np.testing.assert_array_equal(t.getMatrix(),
-            [[0.131,0.131,0.131,0.131,0.131,0.131,
-            0.131,0.131,0.131,0.131,0.131,0.131,
-            0.131,0.131,0.131,0.131,0.131,0.131,
-            0.131,0.131,0.131,0.131,0.131,0.131],
-            [0.132,0.132,0.132,0.132,0.132,0.132,
-            0.132,0.132,0.132,0.132,0.132,0.132,
-            0.132,0.132,0.132,0.132,0.132,0.132,
-            0.132,0.132,0.132,0.132,0.132,0.132],
-            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]])
-
-    def test__loadTariffPeriod__overlapException(self):
-        tp1 = OldTariffPeriod(0,12,0, 0.131)
-        tp2 = OldTariffPeriod(12,23,0, 0.132)
-        t = OldTariff()
-        with self.assertRaises(Exception) as cm:
-            t.loadTariffPeriod([tp1,tp2])
-
-        the_exception = cm.exception
-        self.assertEqual(str(the_exception), "Overlap tariff period")
-
-    def test__loadTariffPeriod__isCompleted(self):
-        tp1 = OldTariffPeriod(0,23,0, 0.131)
-        t = OldTariff()
-        t.loadTariffPeriod([OldTariffPeriod(0,23,0, 0.131),
-        OldTariffPeriod(0,23,1, 0.131),
-        OldTariffPeriod(0,23,2, 0.131),
-        OldTariffPeriod(0,23,3, 0.131),
-        OldTariffPeriod(0,23,4, 0.131),
-        OldTariffPeriod(0,23,5, 0.131),
-        OldTariffPeriod(0,23,6, 0.131)])
-
-        self.assertTrue(t.isCompleted())
-
-    def test__loadTariffPeriod__isNotCompleted(self):
-        tp1 = OldTariffPeriod(0,12,0, 0.131)
-        tp2 = OldTariffPeriod(13,23,0, 0.132)
-        t = OldTariff()
-        t.loadTariffPeriod([tp1,tp2])
-
-        self.assertFalse(t.isCompleted())
-
 class TariffTests(unittest.TestCase):
+    def setUp(self):
+        self.maxDiff = None
+
     def test__getKeyDay__datetime(self):
         t = Tariff()
 
         key = t.getKeyDay(datetime(2020, 1, 1))
 
-        self.assertEqual(key, 1577836800)
+        self.assertEqual(key, 2020010100)
 
     def test__getKeyDay__string(self):
         t = Tariff()
 
         key = t.getKeyDay("01/01/2020", "%d/%m/%Y")
 
-        self.assertEqual(key, 1577836800)
+        self.assertEqual(key, 2020010100)
 
+    def test__loadTariffPeriod__oneOk(self):
+        t = Tariff()
+        tp = TariffPeriod(datetime(2020, 1, 1, 0),
+        datetime(2020, 1, 1, 1), 0.131)
+
+        t.loadTariffPeriod([tp])
+
+        self.assertDictEqual(t.periods,{2020010100: 0.131})
+
+    def test__loadTariffPeriod__nOk(self):
+        t = Tariff()
+
+        t.loadTariffPeriod([
+            TariffPeriod(datetime(2020, 1, 1, 0),datetime(2020, 1, 1, 11), 0.131),
+            TariffPeriod(datetime(2020, 1, 1, 11),datetime(2020, 1, 1, 22), 0.078),
+            TariffPeriod(datetime(2020, 1, 1, 22),datetime(2020, 1, 2, 0), 0.131),
+        ])
+
+        self.assertDictEqual(t.periods, {2020010100: 0.131, 2020010101: 0.131,
+            2020010102: 0.131, 2020010103: 0.131, 2020010104: 0.131,
+            2020010105: 0.131, 2020010106: 0.131, 2020010107: 0.131,
+            2020010108: 0.131, 2020010109: 0.131, 2020010110: 0.131,
+            2020010111: 0.078, 2020010112: 0.078, 2020010113: 0.078,
+            2020010114: 0.078, 2020010115: 0.078, 2020010116: 0.078,
+            2020010117: 0.078, 2020010118: 0.078, 2020010119: 0.078,
+            2020010120: 0.078, 2020010121: 0.078, 2020010122: 0.131,
+            2020010123: 0.131})
+
+    def test__loadTariffPeriod__overlapException(self):
+        t = Tariff()
+
+        with self.assertRaises(Exception) as cm:
+            t.loadTariffPeriod([
+                TariffPeriod(datetime(2020, 1, 1, 0),datetime(2020, 1, 1, 11), 0.131),
+                TariffPeriod(datetime(2020, 1, 1, 10),datetime(2020, 1, 1, 22), 0.078),
+                TariffPeriod(datetime(2020, 1, 1, 22),datetime(2020, 1, 2, 0), 0.131),
+            ])
+
+        the_exception = cm.exception
+        self.assertEqual(str(the_exception), "Overlap tariff period")
 
 class TariffPeriodTests(unittest.TestCase):
     def test__getPrice__Ok(self):

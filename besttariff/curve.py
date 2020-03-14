@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import numpy as np
 
 class Curve:
     """Model Curve represents consumcion on specidic date an hour
@@ -27,3 +28,21 @@ class TariffPeriod:
     
     def getPrice(self):
         return self.kwh_price
+
+class Tariff:
+    """Model Tariff represents all tariff of the contract
+    @param  periods     matrixPrice
+    """
+    def __init__(self, periods=None):
+        if periods is None:
+            periods = np.zeros(shape=(7,24))
+        self.periods = periods
+
+    def loadTariffPeriod(self, tariffPeriod):
+        hour = tariffPeriod.start_hour
+        while hour < tariffPeriod.end_hour:
+            self.periods[tariffPeriod.day_of_week][hour] = tariffPeriod.kwh_price
+            hour += 1
+
+    def getMatrix(self):
+        return self.periods

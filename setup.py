@@ -11,4 +11,5 @@ setup(name='besttariff',
     license='GPLv3',
     packages=find_packages(exclude=('tests', 'docs')),
     test_suite='tests',
+    install_requieres=['numpy'],
 )

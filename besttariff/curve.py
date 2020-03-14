@@ -15,8 +15,8 @@ class Curve:
 
 class TariffPeriod:
     """Model TariffPeriod represents a tariff period on specific time and price
-    @param  start_hour      int from 0 to 23
-    @param  end_hour        int from 1 to 24
+    @param  start_hour      int from 0 to 22
+    @param  end_hour        int from 1 to 23
     @param  day_of_week     int from 0 to 6
     @param  kwh_price       float(1.0)
     """
@@ -31,18 +31,24 @@ class TariffPeriod:
 
 class Tariff:
     """Model Tariff represents all tariff of the contract
-    @param  periods     matrixPrice
+    @param  periods     matrix that represent a whole week of prices
     """
     def __init__(self, periods=None):
         if periods is None:
             periods = np.zeros(shape=(7,24))
         self.periods = periods
 
-    def loadTariffPeriod(self, tariffPeriod):
-        hour = tariffPeriod.start_hour
-        while hour < tariffPeriod.end_hour:
-            self.periods[tariffPeriod.day_of_week][hour] = tariffPeriod.kwh_price
-            hour += 1
+    def loadTariffPeriod(self, tariffPeriodList):
+        """Load TariffPeriod to Tariff matrix {periods}
+        Arguments:
+            tariffPeriodList {[TariffPeriod]} -- List of TariffPeriod objects
+        """
+        for tariffPeriod in tariffPeriodList:
+            hour = tariffPeriod.start_hour
+            while hour <= tariffPeriod.end_hour:
+                self.periods[tariffPeriod.day_of_week][hour] \
+                    = tariffPeriod.kwh_price
+                hour += 1
 
     def getMatrix(self):
         return self.periods

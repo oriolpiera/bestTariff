@@ -136,8 +136,8 @@ class TariffConstructor:
             return price_list[0][self.PRICE]
 
         for price in price_list:
-            if price[self.HOUR_START] < date_time.hour and \
-                price[self.HOUR_END] > date_time.hour and \
+            if price[self.HOUR_START] <= date_time.hour-1 and \
+                price[self.HOUR_END] > date_time.hour-1 and \
                 price[self.MONTH_START] <= date_time.month and \
                 price[self.MONTH_END] >= date_time.month:
                 return price[self.PRICE]

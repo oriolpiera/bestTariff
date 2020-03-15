@@ -113,16 +113,20 @@ class TariffCalculatorTests(unittest.TestCase):
         self.assertEqual(value, "2.0_DHA")
 
 class TariffConstructorTests(unittest.TestCase):
-    def test__getPrice__20AOk(self):
+    def test__getPrice__20A_oK(self):
         price = TariffConstructor().getPrice(datetime(2020, 1, 1, 1),"2.0_A")
 
         self.assertEqual(price, 0.139)
 
-    def test__getPrice__20DHAok(self):
+    def test__getPrice__20DHA_oK(self):
         price = TariffConstructor().getPrice(datetime(2020, 1, 1, 1),"2.0_DHA")
 
         self.assertEqual(price, 0.082)
 
+    def test__getPrice__20DHA_firstHourPrice_oK(self):
+        price = TariffConstructor().getPrice(datetime(2020, 1, 1, 13),"2.0_DHA")
+
+        self.assertEqual(price, 0.161)
 
 if __name__ == '__main__':
     unittest.main()

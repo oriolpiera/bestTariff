@@ -118,6 +118,11 @@ class TariffConstructorTests(unittest.TestCase):
 
         self.assertEqual(price, 0.139)
 
+    def test__getPrice__20DHAok(self):
+        price = TariffConstructor().getPrice(datetime(2020, 1, 1, 1),"2.0_DHA")
+
+        self.assertEqual(price, 0.082)
+
 
 if __name__ == '__main__':
     unittest.main()

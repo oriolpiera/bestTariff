@@ -110,13 +110,18 @@ class TariffConstructor:
     """Imagine Tariff constructor
     """
     TARIFF = {
-        "2.0_A": [[0,24,"*", 0.139]],
-        "2.0_DHA": [[0,12,1-3,0.082], [12,22,1-3,0.161], [22,24,1-3,0.082],
-            [0,13,3-10,0.082], [13,23,3-10,0.161], [23,24,3-10,0.082],
-            [0,12,10-12,0.082], [12,22,10-12,0.161],[22,24,10-12,0.082]]
+        "2.0_A": [[0,24,1,12, 0.139]],
+        "2.0_DHA": [[0,12,1,3,0.082], [12,22,1,3,0.161], [22,24,1,3,0.082],
+            [0,13,3,10,0.082], [13,23,3,10,0.161], [23,24,3,10,0.082],
+            [0,12,10,12,0.082], [12,22,10,12,0.161],[22,24,10,12,0.082]]
     }
+    HOUR_START = 0
+    HOUR_END = 1
+    MONTH_START = 2
+    MONTH_END = 3
+    PRICE = 4
 
-    def getPrice(self, datetime, tariff):
+    def getPrice(self, date_time, tariff):
         """[summary]
 
         Arguments:
@@ -127,7 +132,14 @@ class TariffConstructor:
             float -- Amount price in tariff
         """
         price_list  = self.TARIFF[tariff]
-        print(price_list)
         if len(price_list) == 1:
-            return price_list[0][3]
+            return price_list[0][self.PRICE]
+
+        for price in price_list:
+            if price[self.HOUR_START] < date_time.hour and \
+                price[self.HOUR_END] > date_time.hour and \
+                price[self.MONTH_START] <= date_time.month and \
+                price[self.MONTH_END] >= date_time.month:
+                return price[self.PRICE]
+
         return 1

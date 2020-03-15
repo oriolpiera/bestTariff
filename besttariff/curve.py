@@ -104,3 +104,30 @@ class TariffCalculator:
     def calculatorCurvePrice(self, tariff, curves):
         return 1
 
+
+
+class TariffConstructor:
+    """Imagine Tariff constructor
+    """
+    TARIFF = {
+        "2.0_A": [[0,24,"*", 0.139]],
+        "2.0_DHA": [[0,12,1-3,0.082], [12,22,1-3,0.161], [22,24,1-3,0.082],
+            [0,13,3-10,0.082], [13,23,3-10,0.161], [23,24,3-10,0.082],
+            [0,12,10-12,0.082], [12,22,10-12,0.161],[22,24,10-12,0.082]]
+    }
+
+    def getPrice(self, datetime, tariff):
+        """[summary]
+
+        Arguments:
+            datetime {datetime} -- Datetime curve when hour is end hour of curve
+            tariff {string} -- Name of tariff like 2.0_A, 2.0_DHA...
+
+        Returns:
+            float -- Amount price in tariff
+        """
+        price_list  = self.TARIFF[tariff]
+        print(price_list)
+        if len(price_list) == 1:
+            return price_list[0][3]
+        return 1

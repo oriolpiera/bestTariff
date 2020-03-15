@@ -144,7 +144,7 @@ class TariffCalculatorTests(unittest.TestCase):
     def test__getTariffCompatible__20DHA(self):
         result = TariffCalculator().getTariffCompatible("2.0_DHA")
 
-        self.assertEqual(result, ['2.0_A', '2.0_DHA', '2.0_DHS'])
+        self.assertEqual(sorted(result), sorted(['2.0_A', '2.0_DHA', '2.0_DHS']))
 
     def test__getTariffCompatible__empty(self):
         result = TariffCalculator().getTariffCompatible("1.0_XXX")

@@ -143,6 +143,13 @@ class TariffConstructorTests(unittest.TestCase):
 
         self.assertEqual(price, 0.161)
 
+    def test__getPrice__tariffNotExist(self):
+        with self.assertRaises(Exception) as cm:
+            TariffConstructor().getPrice(datetime(2020, 3, 28, 13),"2.0_XXX")
+
+        the_exception = cm.exception
+        self.assertEqual(str(the_exception), "'2.0_XXX'")
+
     def test__beforeLastSundayOfMonth__True(self):
         self.assertTrue(TariffConstructor().beforeLastSundayOfMonth(
             datetime(2020, 4, 25)
@@ -152,6 +159,16 @@ class TariffConstructorTests(unittest.TestCase):
         self.assertFalse(TariffConstructor().beforeLastSundayOfMonth(
             datetime(2020, 4, 26)
         ))
+
+    def test__getTariffCompatible__20DHA(self):
+        result = TariffConstructor().getTariffCompatible("2.0_DHA")
+
+        self.assertEqual(result, ['2.0_A', '2.0_DHA', '2.0_DHS'])
+
+    def test__getTariffCompatible__empty(self):
+        result = TariffConstructor().getTariffCompatible("1.0_XXX")
+
+        self.assertEqual(result, [])
 
 if __name__ == '__main__':
     unittest.main()

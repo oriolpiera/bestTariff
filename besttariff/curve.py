@@ -113,7 +113,9 @@ class TariffConstructor:
         "2.0_A": [[0,24,1,12, 0.139]],
         "2.0_DHA": [[0,12,1,3,0.082], [12,22,1,3,0.161], [22,24,1,3,0.082],
             [0,13,3,10,0.082], [13,23,3,10,0.161], [23,24,3,10,0.082],
-            [0,12,10,12,0.082], [12,22,10,12,0.161],[22,24,10,12,0.082]]
+            [0,12,10,12,0.082], [12,22,10,12,0.161],[22,24,10,12,0.082]],
+        "2.0_DHS": [[0,1,1,12,0.091], [1,7,1,12,0.073], [7,13,1,12,0.091],
+            [13,23,1,12,0.160], [23,24,1,12,0.091]],
     }
     HOUR_START = 0
     HOUR_END = 1
@@ -151,9 +153,20 @@ class TariffConstructor:
                 price[self.MONTH_END] >= date_time.month:
                 return price[self.PRICE]
 
-        return 1
+        return False
 
     def beforeLastSundayOfMonth(self, date_time):
         month = calendar.monthcalendar(date_time.year, date_time.month)
         day_of_month = max(month[-1][calendar.SUNDAY], month[-2][calendar.SUNDAY])
         return date_time.day < day_of_month
+
+    def getTariffCompatible(self, tariff_name):
+        import re
+        tariff_list = list(self.TARIFF.keys())
+        tariff_number = tariff_name.split('_')[0]
+        tariff_regex = tariff_number + ".*"
+        r = re.compile(tariff_regex)
+
+        return list(filter(r.match, tariff_list))
+
+

@@ -156,9 +156,10 @@ class TariffCalculatorTests(unittest.TestCase):
         cu = CurveUtils()
         curves = cu.loadCurveFile("./tests/sample_curve_file_20200101.csv")
 
-        value = tc.calculator("2.0_A", curves)
+        value, allResults = tc.calculator("2.0_A", curves)
 
         self.assertEqual(value, "2.0_DHA")
+        self.assertEqual(allResults, {'2.0_A': 4.56, '2.0_DHA': 4.49, '2.0_DHS': 4.77})
 
     def test__calculatorCurvePrice__oneCurve(self):
         tc = TariffCalculator()

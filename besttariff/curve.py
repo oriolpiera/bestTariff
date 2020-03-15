@@ -156,13 +156,15 @@ class TariffCalculator:
         lower_tariff_name = ""
         lower_tariff_amount = sys.float_info.max
         tariff_list = self.getTariffCompatible(tariff_name)
+        allResults = {}
         for name in tariff_list:
             amount = self.calculatorCurvePrice(name, curves)
             if amount < lower_tariff_amount:
                 lower_tariff_amount = amount
                 lower_tariff_name = name
+            allResults[name] = round(amount,2)
 
-        return lower_tariff_name
+        return lower_tariff_name, allResults
 
     def calculatorCurvePrice(self, tariff, curves):
         amount = 0

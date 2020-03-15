@@ -80,33 +80,6 @@ class CurveUtils:
         return curves
 
 class TariffCalculator:
-    def calculator(self, tariff_list, curves):
-        """Calculator
-
-        Arguments:
-            tariff_list {[Tariff]} -- List of Tariff
-            curves {dict()} -- Dict of curves
-
-        Returns:
-            String -- Name of Tariff
-        """
-        import sys
-        lower_tariff_name = ""
-        lower_tariff_amount = sys.float_info.max
-        for tariff in tariff_list:
-            amount = self.calculatorCurvePrice(tariff, curves)
-            if amount < lower_tariff_amount:
-                lower_tariff_amount = amount
-                lower_tariff_name = tariff.name
-
-        return lower_tariff_name
-
-    def calculatorCurvePrice(self, tariff, curves):
-        return 1
-
-
-
-class TariffConstructor:
     """Imagine Tariff constructor
     """
     TARIFF = {
@@ -169,4 +142,31 @@ class TariffConstructor:
 
         return list(filter(r.match, tariff_list))
 
+    def calculator(self, tariff_name, curves):
+        """Calculator
 
+        Arguments:
+            tariff_list {[Tariff]} -- List of Tariff
+            curves {dict()} -- Dict of curves
+
+        Returns:
+            String -- Name of Tariff
+        """
+        import sys
+        lower_tariff_name = ""
+        lower_tariff_amount = sys.float_info.max
+        tariff_list = self.getTariffCompatible(tariff_name)
+        for name in tariff_list:
+            amount = self.calculatorCurvePrice(name, curves)
+            if amount < lower_tariff_amount:
+                lower_tariff_amount = amount
+                lower_tariff_name = name
+
+        return lower_tariff_name
+
+    def calculatorCurvePrice(self, tariff, curves):
+        amount = 0
+        for key in curves:
+            price = self.getPrice(datetime.strptime(str(key), "%Y%m%d%H"), tariff)
+            amount += (price * curves[key])
+        return amount

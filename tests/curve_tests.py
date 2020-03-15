@@ -94,81 +94,80 @@ class CurveUtilsTests(unittest.TestCase):
             2019010108: 0.357, 2019010109: 0.353})
 
 class TariffCalculatorTests(unittest.TestCase):
-    def test__calculator__ok(self):
-        tc = TariffCalculator()
-        tariff = Tariff(TARIFF_TYPE_ENERGY, {2020010100: 0.131, 2020010101: 0.131,
-            2020010102: 0.131, 2020010103: 0.131, 2020010104: 0.131,
-            2020010105: 0.131, 2020010106: 0.131, 2020010107: 0.131,
-            2020010108: 0.131, 2020010109: 0.131, 2020010110: 0.131,
-            2020010111: 0.078, 2020010112: 0.078, 2020010113: 0.078,
-            2020010114: 0.078, 2020010115: 0.078, 2020010116: 0.078,
-            2020010117: 0.078, 2020010118: 0.078, 2020010119: 0.078,
-            2020010120: 0.078, 2020010121: 0.078, 2020010122: 0.131,
-            2020010123: 0.131}, "2.0_DHA")
-        cu = CurveUtils()
-        curves = cu.loadCurveFile("./tests/sample_curve_file_20200101.csv")
-
-        value = tc.calculator([tariff], curves)
-
-        self.assertEqual(value, "2.0_DHA")
-
-class TariffConstructorTests(unittest.TestCase):
     def test__getPrice__20A_oK(self):
-        price = TariffConstructor().getPrice(datetime(2020, 1, 1, 1),"2.0_A")
+        price = TariffCalculator().getPrice(datetime(2020, 1, 1, 1),"2.0_A")
 
         self.assertEqual(price, 0.139)
 
     def test__getPrice__20DHA_oK(self):
-        price = TariffConstructor().getPrice(datetime(2020, 1, 1, 1),"2.0_DHA")
+        price = TariffCalculator().getPrice(datetime(2020, 1, 1, 1),"2.0_DHA")
 
         self.assertEqual(price, 0.082)
 
     def test__getPrice__20DHA_firstHourPrice_oK(self):
-        price = TariffConstructor().getPrice(datetime(2020, 1, 1, 13),"2.0_DHA")
+        price = TariffCalculator().getPrice(datetime(2020, 1, 1, 13),"2.0_DHA")
 
         self.assertEqual(price, 0.161)
 
     def test__getPrice__20DHA_lastHourPrice_oK(self):
-        price = TariffConstructor().getPrice(datetime(2020, 1, 1, 12),"2.0_DHA")
+        price = TariffCalculator().getPrice(datetime(2020, 1, 1, 12),"2.0_DHA")
 
         self.assertEqual(price, 0.082)
 
     def test__getPrice__20DHA_afterChangeTariffMonth_oK(self):
-        price = TariffConstructor().getPrice(datetime(2020, 3, 29, 13),"2.0_DHA")
+        price = TariffCalculator().getPrice(datetime(2020, 3, 29, 13),"2.0_DHA")
 
         self.assertEqual(price, 0.082)
 
     def test__getPrice__20DHA_beforeChangeTariffMonth_oK(self):
-        price = TariffConstructor().getPrice(datetime(2020, 3, 28, 13),"2.0_DHA")
+        price = TariffCalculator().getPrice(datetime(2020, 3, 28, 13),"2.0_DHA")
 
         self.assertEqual(price, 0.161)
 
     def test__getPrice__tariffNotExist(self):
         with self.assertRaises(Exception) as cm:
-            TariffConstructor().getPrice(datetime(2020, 3, 28, 13),"2.0_XXX")
+            TariffCalculator().getPrice(datetime(2020, 3, 28, 13),"2.0_XXX")
 
         the_exception = cm.exception
         self.assertEqual(str(the_exception), "'2.0_XXX'")
 
     def test__beforeLastSundayOfMonth__True(self):
-        self.assertTrue(TariffConstructor().beforeLastSundayOfMonth(
+        self.assertTrue(TariffCalculator().beforeLastSundayOfMonth(
             datetime(2020, 4, 25)
         ))
 
     def test__beforeLastSundayOfMonth__True(self):
-        self.assertFalse(TariffConstructor().beforeLastSundayOfMonth(
+        self.assertFalse(TariffCalculator().beforeLastSundayOfMonth(
             datetime(2020, 4, 26)
         ))
 
     def test__getTariffCompatible__20DHA(self):
-        result = TariffConstructor().getTariffCompatible("2.0_DHA")
+        result = TariffCalculator().getTariffCompatible("2.0_DHA")
 
         self.assertEqual(result, ['2.0_A', '2.0_DHA', '2.0_DHS'])
 
     def test__getTariffCompatible__empty(self):
-        result = TariffConstructor().getTariffCompatible("1.0_XXX")
+        result = TariffCalculator().getTariffCompatible("1.0_XXX")
 
         self.assertEqual(result, [])
+
+    def test__calculator__ok(self):
+        tc = TariffCalculator()
+        cu = CurveUtils()
+        curves = cu.loadCurveFile("./tests/sample_curve_file_20200101.csv")
+
+        value = tc.calculator("2.0_A", curves)
+
+        self.assertEqual(value, "2.0_DHA")
+
+    def test__calculatorCurvePrice__oneCurve(self):
+        tc = TariffCalculator()
+        curve = {2019010101: 1.308}
+
+        value = tc.calculatorCurvePrice("2.0_DHS", curve)
+
+        self.assertEqual(value, 0.119028)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -66,6 +66,9 @@ class TariffPeriodTests(unittest.TestCase):
         self.assertEqual(price, 0.131)
 
 class CurveUtilsTests(unittest.TestCase):
+    def setUp(self):
+        self.maxDiff = None
+
     def test__getKeyDay__datetime(self):
         cu = CurveUtils()
 
@@ -80,15 +83,34 @@ class CurveUtilsTests(unittest.TestCase):
 
         self.assertEqual(key, 2020010100)
 
-    def test__loadCurveFile(self):
+    def test__loadCurveFile__Ok(self):
         cu = CurveUtils()
 
         curve_dict = cu.loadCurveFile("./tests/sample_curve_file.csv")
 
-        self.assertEqual(curve_dict, {2019010101: '1,308',
-            2019010102: '0,455', 2019010103: '0,42', 2019010104: '0,383',
-            2019010105: '0,356', 2019010106: '0,341', 2019010107: '0,352',
-            2019010108: '0,357', 2019010109: '0,353'})
+        self.assertEqual(curve_dict, {2019010101: 1.308,
+            2019010102: 0.455, 2019010103: 0.42, 2019010104: 0.383,
+            2019010105: 0.356, 2019010106: 0.341, 2019010107: 0.352,
+            2019010108: 0.357, 2019010109: 0.353})
+
+class TariffCalculatorTests(unittest.TestCase):
+    def test__calculator__ok(self):
+        tc = TariffCalculator()
+        tariff = Tariff(TARIFF_TYPE_ENERGY, {2020010100: 0.131, 2020010101: 0.131,
+            2020010102: 0.131, 2020010103: 0.131, 2020010104: 0.131,
+            2020010105: 0.131, 2020010106: 0.131, 2020010107: 0.131,
+            2020010108: 0.131, 2020010109: 0.131, 2020010110: 0.131,
+            2020010111: 0.078, 2020010112: 0.078, 2020010113: 0.078,
+            2020010114: 0.078, 2020010115: 0.078, 2020010116: 0.078,
+            2020010117: 0.078, 2020010118: 0.078, 2020010119: 0.078,
+            2020010120: 0.078, 2020010121: 0.078, 2020010122: 0.131,
+            2020010123: 0.131}, "2.0_DHA")
+        cu = CurveUtils()
+        curves = cu.loadCurveFile("./tests/sample_curve_file_20200101.csv")
+
+        value = tc.calculator([tariff], curves)
+
+        self.assertEqual(value, "2.0_DHA")
 
 if __name__ == '__main__':
     unittest.main()

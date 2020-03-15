@@ -22,12 +22,13 @@ class Tariff:
     """Model Tariff represents all tariff of the contract
     @param  periods     dict that represent a whole tariff, key is %Y%m%d%H
     """
-    def __init__(self, tariff_type=TARIFF_TYPE_ENERGY, periods=None):
+    def __init__(self, tariff_type=TARIFF_TYPE_ENERGY, periods=None, name=None):
         if periods is None:
             periods = {}
         self.periods = periods
         self.tariff_type = tariff_type
         self.utils = CurveUtils()
+        self.name = name
 
     def loadTariffPeriod(self, tariffPeriodList):
         """Load TariffPeriod to Tariff matrix {periods}
@@ -73,7 +74,33 @@ class CurveUtils:
             spamreader = csv.reader(csvfile, delimiter=';')
             for row in spamreader:
                 key = self.getKeyDay(row[1], int(row[2]), "%d/%m/%Y")
-                value = row[3]
+                value = float(row[3].replace(',','.'))
                 curves[key] = value
 
         return curves
+
+class TariffCalculator:
+    def calculator(self, tariff_list, curves):
+        """Calculator
+
+        Arguments:
+            tariff_list {[Tariff]} -- List of Tariff
+            curves {dict()} -- Dict of curves
+
+        Returns:
+            String -- Name of Tariff
+        """
+        import sys
+        lower_tariff_name = ""
+        lower_tariff_amount = sys.float_info.max
+        for tariff in tariff_list:
+            amount = self.calculatorCurvePrice(tariff, curves)
+            if amount < lower_tariff_amount:
+                lower_tariff_amount = amount
+                lower_tariff_name = tariff.name
+
+        return lower_tariff_name
+
+    def calculatorCurvePrice(self, tariff, curves):
+        return 1
+

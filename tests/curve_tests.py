@@ -67,18 +67,28 @@ class TariffPeriodTests(unittest.TestCase):
 
 class CurveUtilsTests(unittest.TestCase):
     def test__getKeyDay__datetime(self):
-        t = CurveUtils()
+        cu = CurveUtils()
 
-        key = t.getKeyDay(datetime(2020, 1, 1))
+        key = cu.getKeyDay(datetime(2020, 1, 1))
 
         self.assertEqual(key, 2020010100)
 
     def test__getKeyDay__string(self):
-        t = CurveUtils()
+        cu = CurveUtils()
 
-        key = t.getKeyDay("01/01/2020", "%d/%m/%Y")
+        key = cu.getKeyDay("01/01/2020", 0, "%d/%m/%Y")
 
         self.assertEqual(key, 2020010100)
+
+    def test__loadCurveFile(self):
+        cu = CurveUtils()
+
+        curve_dict = cu.loadCurveFile("./tests/sample_curve_file.csv")
+
+        self.assertEqual(curve_dict, {2019010101: '1,308',
+            2019010102: '0,455', 2019010103: '0,42', 2019010104: '0,383',
+            2019010105: '0,356', 2019010106: '0,341', 2019010107: '0,352',
+            2019010108: '0,357', 2019010109: '0,353'})
 
 if __name__ == '__main__':
     unittest.main()

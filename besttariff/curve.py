@@ -58,7 +58,22 @@ class TariffPeriod:
         return self.kwh_price
 
 class CurveUtils:
-    def getKeyDay(self, date, format=None):
+    def getKeyDay(self, date, hour=0, format=None):
         if format is None:
             return int(datetime.strftime(date, "%Y%m%d%H"))
-        return int(datetime.strftime(datetime.strptime(date, format), "%Y%m%d%H"))
+        if hour is not None:
+            date_time = datetime.strptime(date, format) + timedelta(hours=hour)
+        return int(datetime.strftime(date_time, "%Y%m%d%H"))
+
+    def loadCurveFile(self, filename):
+        import csv
+        curves = {}
+        with open(filename, newline='') as csvfile:
+            next(csvfile) #Header
+            spamreader = csv.reader(csvfile, delimiter=';')
+            for row in spamreader:
+                key = self.getKeyDay(row[1], int(row[2]), "%d/%m/%Y")
+                value = row[3]
+                curves[key] = value
+
+        return curves

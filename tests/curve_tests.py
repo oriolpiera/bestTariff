@@ -128,5 +128,30 @@ class TariffConstructorTests(unittest.TestCase):
 
         self.assertEqual(price, 0.161)
 
+    def test__getPrice__20DHA_lastHourPrice_oK(self):
+        price = TariffConstructor().getPrice(datetime(2020, 1, 1, 12),"2.0_DHA")
+
+        self.assertEqual(price, 0.082)
+
+    def test__getPrice__20DHA_afterChangeTariffMonth_oK(self):
+        price = TariffConstructor().getPrice(datetime(2020, 3, 29, 13),"2.0_DHA")
+
+        self.assertEqual(price, 0.082)
+
+    def test__getPrice__20DHA_beforeChangeTariffMonth_oK(self):
+        price = TariffConstructor().getPrice(datetime(2020, 3, 28, 13),"2.0_DHA")
+
+        self.assertEqual(price, 0.161)
+
+    def test__beforeLastSundayOfMonth__True(self):
+        self.assertTrue(TariffConstructor().beforeLastSundayOfMonth(
+            datetime(2020, 4, 25)
+        ))
+
+    def test__beforeLastSundayOfMonth__True(self):
+        self.assertFalse(TariffConstructor().beforeLastSundayOfMonth(
+            datetime(2020, 4, 26)
+        ))
+
 if __name__ == '__main__':
     unittest.main()

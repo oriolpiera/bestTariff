@@ -69,7 +69,7 @@ class CurveUtils:
     def loadCurveFile(self, filename):
         import csv
         curves = {}
-        with open(filename, newline='') as csvfile:
+        with open(filename) as csvfile:
             next(csvfile) #Header
             spamreader = csv.reader(csvfile, delimiter=';')
             for row in spamreader:
@@ -138,8 +138,22 @@ class TariffConstructor:
         for price in price_list:
             if price[self.HOUR_START] <= date_time.hour-1 and \
                 price[self.HOUR_END] > date_time.hour-1 and \
+                date_time.month in [3,10]:
+                if price[self.MONTH_START] == date_time.month and \
+                    not self.beforeLastSundayOfMonth(date_time):
+                    return price[self.PRICE]
+                elif price[self.MONTH_END] == date_time.month and \
+                    self.beforeLastSundayOfMonth(date_time):
+                    return price[self.PRICE]
+            elif price[self.HOUR_START] <= date_time.hour-1 and \
+                price[self.HOUR_END] > date_time.hour-1 and \
                 price[self.MONTH_START] <= date_time.month and \
                 price[self.MONTH_END] >= date_time.month:
                 return price[self.PRICE]
 
         return 1
+
+    def beforeLastSundayOfMonth(self, date_time):
+        month = calendar.monthcalendar(date_time.year, date_time.month)
+        day_of_month = max(month[-1][calendar.SUNDAY], month[-2][calendar.SUNDAY])
+        return date_time.day < day_of_month

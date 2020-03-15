@@ -15,20 +15,6 @@ class TariffTests(unittest.TestCase):
     def setUp(self):
         self.maxDiff = None
 
-    def test__getKeyDay__datetime(self):
-        t = Tariff()
-
-        key = t.getKeyDay(datetime(2020, 1, 1))
-
-        self.assertEqual(key, 2020010100)
-
-    def test__getKeyDay__string(self):
-        t = Tariff()
-
-        key = t.getKeyDay("01/01/2020", "%d/%m/%Y")
-
-        self.assertEqual(key, 2020010100)
-
     def test__loadTariffPeriod__oneOk(self):
         t = Tariff()
         tp = TariffPeriod(datetime(2020, 1, 1, 0),
@@ -78,6 +64,21 @@ class TariffPeriodTests(unittest.TestCase):
         price = tp.getPrice()
 
         self.assertEqual(price, 0.131)
+
+class CurveUtilsTests(unittest.TestCase):
+    def test__getKeyDay__datetime(self):
+        t = CurveUtils()
+
+        key = t.getKeyDay(datetime(2020, 1, 1))
+
+        self.assertEqual(key, 2020010100)
+
+    def test__getKeyDay__string(self):
+        t = CurveUtils()
+
+        key = t.getKeyDay("01/01/2020", "%d/%m/%Y")
+
+        self.assertEqual(key, 2020010100)
 
 if __name__ == '__main__':
     unittest.main()

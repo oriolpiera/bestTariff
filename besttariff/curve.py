@@ -6,7 +6,6 @@ import calendar
 TARIFF_TYPE_ENERGY = 1
 TARIFF_TYPE_POWER = 2
 
-
 class Curve:
     """Model Curve represents consumcion on specidic date an hour
     @param  date    datetime(2020, 01, 01, 0)
@@ -28,6 +27,7 @@ class Tariff:
             periods = {}
         self.periods = periods
         self.tariff_type = tariff_type
+        self.utils = CurveUtils()
 
     def loadTariffPeriod(self, tariffPeriodList):
         """Load TariffPeriod to Tariff matrix {periods}
@@ -37,15 +37,11 @@ class Tariff:
         for tariffPeriod in tariffPeriodList:
             start_time = tariffPeriod.start_time
             while start_time < tariffPeriod.end_time:
-                if self.getKeyDay(start_time) in self.periods:
+                if self.utils.getKeyDay(start_time) in self.periods:
                     raise Exception("Overlap tariff period")
-                self.periods[self.getKeyDay(start_time)] = tariffPeriod.kwh_price
+                self.periods[self.utils.getKeyDay(start_time)] = tariffPeriod.kwh_price
                 start_time += timedelta(hours=1)
 
-    def getKeyDay(self, date, format=None):
-        if format is None:
-            return int(datetime.strftime(date, "%Y%m%d%H"))
-        return int(datetime.strftime(datetime.strptime(date, format), "%Y%m%d%H"))
 
 class TariffPeriod:
     """Model TariffPeriod represents a tariff period on specific time and price
@@ -60,3 +56,9 @@ class TariffPeriod:
 
     def getPrice(self):
         return self.kwh_price
+
+class CurveUtils:
+    def getKeyDay(self, date, format=None):
+        if format is None:
+            return int(datetime.strftime(date, "%Y%m%d%H"))
+        return int(datetime.strftime(datetime.strptime(date, format), "%Y%m%d%H"))
